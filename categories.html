@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Books — KitabGhar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="page-head"><div class="container">
+  <p class="breadcrumb"><a href="index.html">Home</a> / <span id="crumb">All Books</span></p>
+  <h1 id="page-title">All Books</h1>
+  <p id="page-sub" style="color:var(--muted2);margin-top:.3rem">Browse our complete collection.</p>
+</div></section>
+<section class="section"><div class="container">
+  <div class="filters" id="filters"></div>
+  <div class="books-grid" id="books-grid">
+    <div class="skeleton" style="height:320px;border-radius:12px"></div>
+    <div class="skeleton" style="height:320px;border-radius:12px"></div>
+    <div class="skeleton" style="height:320px;border-radius:12px"></div>
+    <div class="skeleton" style="height:320px;border-radius:12px"></div>
+  </div>
+  <div id="empty" style="display:none" class="empty">
+    <div class="empty-icon">📭</div>
+    <h2>No books found</h2>
+    <p style="color:var(--muted2);margin:.5rem 0 1.5rem">Try a different category or search term.</p>
+    <a href="categories.html" class="btn btn-primary">View All Books</a>
+  </div>
+</div></section>
+<div id="site-footer"></div>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script>
+const catColors={'urdu-books':'linear-gradient(135deg,#fff0f0,#ffd6d6)','islamic-books':'linear-gradient(135deg,#edfff4,#ccf0d8)','english-books':'linear-gradient(135deg,#e8f4ff,#cce4ff)','kids-corner':'linear-gradient(135deg,#fff8e6,#ffe8b3)','academic-books':'linear-gradient(135deg,#f4eeff,#e0d0ff)'};
+(async()=>{
+  await Store.ready();
+  mountLayout('books');
+  const p=new URLSearchParams(location.search);
+  const activeCat=p.get('cat')||'';
+  const q=(p.get('q')||'').toLowerCase().trim();
+  const cats=Store.getCategories();
+  const books=Store.getBooks();
+
+  if(q){
+    document.getElementById('page-title').textContent=`Search: "${q}"`;
+    document.getElementById('crumb').textContent='Search';
+    document.getElementById('page-sub').textContent='';
+  } else if(activeCat){
+    const c=cats.find(c=>c.slug===activeCat);
+    if(c){document.getElementById('page-title').textContent=c.icon+' '+c.name;document.getElementById('crumb').textContent=c.name;}
+  }
+
+  document.getElementById('filters').innerHTML=
+    `<a href="categories.html" class="filter-chip ${!activeCat&&!q?'active':''}">📚 All Books</a>`+
+    cats.map(c=>`<a href="categories.html?cat=${c.slug}" class="filter-chip ${activeCat===c.slug?'active':''}">${c.icon||''} ${c.name}</a>`).join('');
+
+  let filtered=books;
+  if(activeCat) filtered=filtered.filter(b=>b.category===activeCat);
+  if(q) filtered=filtered.filter(b=>(b.title+' '+(b.author||'')).toLowerCase().includes(q));
+
+  const grid=document.getElementById('books-grid');
+  if(!filtered.length){grid.style.display='none';document.getElementById('empty').style.display='block';}
+  else grid.innerHTML=filtered.map(bookCardHTML).join('');
+})();
+</script>
+</body></html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cart — KitabGhar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="page-head"><div class="container">
+  <p class="breadcrumb"><a href="index.html">Home</a> / Cart</p>
+  <h1>🛒 Your Cart</h1>
+</div></section>
+<section style="padding:3rem 0;min-height:60vh"><div class="container"><div id="cart-root"></div></div></section>
+<div id="site-footer"></div>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script>
+function Rs(n){return 'Rs. '+Number(n).toLocaleString('en-PK');}
+(async()=>{
+  await Store.ready();
+  mountLayout();
+  renderCart();
+})();
+function renderCart(){
+  const cart=Store.getCart();
+  const root=document.getElementById('cart-root');
+  if(!cart.length){root.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><h2>Your cart is empty</h2><p style="color:var(--muted2);margin:.5rem 0 1.5rem">Add some books and come back!</p><a href="categories.html" class="btn btn-primary">Browse Books</a></div>`;return;}
+  const items=cart.map(c=>({...c,book:Store.getBook(c.id)})).filter(i=>i.book);
+  const sub=items.reduce((s,i)=>s+i.book.price*i.qty,0);
+  const ship=sub>=2000?0:200;
+  const total=sub+ship;
+  root.innerHTML=`<div class="cart-layout">
+    <div>
+      ${items.map(i=>`
+        <div class="cart-item">
+          <a href="product.html?id=${i.book.id}">
+            ${i.book.cover?`<img src="${i.book.cover}" alt="${i.book.title}" onerror="this.style.display='none'">`:`<div style="width:80px;height:104px;background:var(--sand);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:2rem">📚</div>`}
+          </a>
+          <div>
+            <a href="product.html?id=${i.book.id}" style="text-decoration:none"><h4 style="font-size:.9rem;font-family:var(--font-display)">${i.book.title}</h4></a>
+            <p style="color:var(--muted2);font-size:.78rem;margin:.2rem 0">${i.book.author||''}</p>
+            <p style="font-weight:800;color:var(--bark);margin-top:.3rem">${Rs(i.book.price)}</p>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+            <div class="qty">
+              <button onclick="upd('${i.id}',${i.qty-1})">−</button>
+              <input type="number" value="${i.qty}" onchange="upd('${i.id}',+this.value)">
+              <button onclick="upd('${i.id}',${i.qty+1})">+</button>
+            </div>
+            <p style="font-weight:700;color:var(--bark)">${Rs(i.book.price*i.qty)}</p>
+            <button onclick="rem('${i.id}')" style="background:rgba(192,57,43,.1);color:var(--red);border:none;padding:.3rem .65rem;border-radius:8px;font-size:.75rem;cursor:pointer;font-family:inherit">🗑️ Remove</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="order-summary">
+      <h3 style="margin-bottom:1.25rem">Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span>${Rs(sub)}</span></div>
+      <div class="summary-row"><span>Shipping</span><span style="color:${ship===0?'var(--green)':'inherit'};font-weight:${ship===0?'700':'400'}">${ship===0?'✓ Free':Rs(ship)}</span></div>
+      ${ship>0?`<p style="font-size:.75rem;color:var(--muted2);margin-top:.2rem">Add ${Rs(2000-sub)} more for free delivery.</p>`:''}
+      <div class="summary-row" style="font-size:1.2rem;font-weight:800;color:var(--ink)"><span>Total</span><span>${Rs(total)}</span></div>
+      <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:1.25rem">Checkout — ${Rs(total)} →</a>
+      <a href="categories.html" class="btn btn-ghost btn-block" style="margin-top:.5rem">← Continue Shopping</a>
+      <p style="font-size:.75rem;color:var(--muted2);text-align:center;margin-top:1rem">🔒 Safe & Secure. Cash on Delivery available.</p>
+    </div>
+  </div>`;
+}
+function upd(id,q){Store.updateCartQty(id,q);renderCart();}
+function rem(id){Store.removeFromCart(id);renderCart();toast('Removed from cart');}
+</script>
+</body></html>

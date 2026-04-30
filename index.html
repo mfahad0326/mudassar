@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KitabGhar — Pakistan's Online Bookstore</title>
+<meta name="description" content="Pakistan's trusted online bookstore. Urdu, English, Islamic, Kids and Academic books with Cash on Delivery.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="slide active">
+    <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1600&q=70')"></div>
+    <div class="container"><div class="slide-inner">
+      <span class="slide-tag">📖 Pakistan's #1 Online Bookstore</span>
+      <h1>Stories that stay <em>with you</em> forever.</h1>
+      <p>Thousands of Urdu, English, Islamic and Academic books — delivered with Cash on Delivery.</p>
+      <div class="slide-btns">
+        <a href="categories.html" class="btn btn-primary btn-lg">Shop Now →</a>
+        <a href="about.html" class="btn btn-outline btn-lg">Our Story</a>
+      </div>
+      <div class="slide-stats">
+        <div><div class="stat-val">5,000+</div><div class="stat-lbl">Books</div></div>
+        <div><div class="stat-val">50K+</div><div class="stat-lbl">Customers</div></div>
+        <div><div class="stat-val">COD</div><div class="stat-lbl">Cash on Delivery</div></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=1600&q=70')"></div>
+    <div class="container"><div class="slide-inner">
+      <span class="slide-tag">🕌 Islamic Books</span>
+      <h1>Knowledge rooted in <em>faith & wisdom.</em></h1>
+      <p>Seerat-un-Nabi ﷺ, Quran Tafseer, Islamic history — authentic editions.</p>
+      <div class="slide-btns">
+        <a href="categories.html?cat=islamic-books" class="btn btn-primary btn-lg">Islamic Books →</a>
+        <a href="categories.html" class="btn btn-outline btn-lg">All Categories</a>
+      </div>
+    </div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?w=1600&q=70')"></div>
+    <div class="container"><div class="slide-inner">
+      <span class="slide-tag">🧒 Kids Corner</span>
+      <h1>Spark <em>imagination</em> from day one.</h1>
+      <p>Illustrated fairy tales, activity books — give your child the gift of reading.</p>
+      <div class="slide-btns">
+        <a href="categories.html?cat=kids-corner" class="btn btn-primary btn-lg">Kids Books →</a>
+        <a href="categories.html" class="btn btn-outline btn-lg">Browse All</a>
+      </div>
+    </div></div>
+  </div>
+  <div class="slide">
+    <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=1600&q=70')"></div>
+    <div class="container"><div class="slide-inner">
+      <span class="slide-tag">📕 Urdu Adab</span>
+      <h1>Urdu ki <em>sarhad nahi,</em> dil mein basay.</h1>
+      <p>Iqbal, Ghalib, Faiz — from classic poetry to modern Urdu fiction.</p>
+      <div class="slide-btns">
+        <a href="categories.html?cat=urdu-books" class="btn btn-primary btn-lg">Urdu Books →</a>
+        <a href="categories.html" class="btn btn-outline btn-lg">More Categories</a>
+      </div>
+    </div></div>
+  </div>
+  <div class="hero-books"><div class="hero-books-grid" id="hero-book-grid"></div></div>
+  <button class="carousel-arrow prev" onclick="moveSlide(-1)">&#8249;</button>
+  <button class="carousel-arrow next" onclick="moveSlide(1)">&#8250;</button>
+  <div class="carousel-dots" id="carousel-dots"></div>
+</section>
+
+<!-- TRUST -->
+<div class="trust-strip"><div class="container"><div class="trust-inner">
+  <div class="trust-item"><div class="trust-icon">🚚</div><div class="trust-label"><strong>Free Delivery</strong><span>Orders above Rs. 2,000</span></div></div>
+  <div class="trust-item"><div class="trust-icon">🛡️</div><div class="trust-label"><strong>100% Original</strong><span>Authentic books</span></div></div>
+  <div class="trust-item"><div class="trust-icon">💵</div><div class="trust-label"><strong>Cash on Delivery</strong><span>Pay when you receive</span></div></div>
+  <div class="trust-item"><div class="trust-icon">↩️</div><div class="trust-label"><strong>Easy Returns</strong><span>7-day return policy</span></div></div>
+</div></div></div>
+
+<!-- CATEGORIES -->
+<section class="section"><div class="container">
+  <div class="section-head">
+    <div><h2>Shop by Category</h2><p>Find exactly what you're looking for.</p></div>
+    <a href="categories.html" class="view-all">View All →</a>
+  </div>
+  <div class="cat-grid" id="cat-grid"><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div><div class="skeleton" style="aspect-ratio:1;border-radius:12px"></div></div>
+</div></section>
+
+<!-- FEATURED -->
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="section-head">
+    <div><h2>Featured Books</h2><p>Hand-picked by our editors.</p></div>
+    <a href="categories.html" class="view-all">View All →</a>
+  </div>
+  <div class="books-grid" id="featured-grid"><div class="skeleton" style="height:320px;border-radius:12px"></div><div class="skeleton" style="height:320px;border-radius:12px"></div><div class="skeleton" style="height:320px;border-radius:12px"></div><div class="skeleton" style="height:320px;border-radius:12px"></div></div>
+</div></section>
+
+<!-- PROMO -->
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="promo-banner">
+    <div style="position:relative;z-index:1">
+      <p class="promo-eyebrow">✨ Special Collection</p>
+      <h2>Islamic Books — Authentic & Affordable</h2>
+      <p>Seerat, Tafseer, Hadith, Fiqh — enrich your library this season.</p>
+      <div class="promo-actions">
+        <a href="categories.html?cat=islamic-books" class="btn btn-primary btn-lg">Browse Islamic Books →</a>
+        <a href="categories.html" class="btn btn-outline btn-lg">All Categories</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- NEW ARRIVALS -->
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="section-head">
+    <div><h2>New Arrivals</h2><p>Fresh additions to our shelves.</p></div>
+    <a href="categories.html" class="view-all">View All →</a>
+  </div>
+  <div class="books-grid" id="new-grid"><div class="skeleton" style="height:320px;border-radius:12px"></div><div class="skeleton" style="height:320px;border-radius:12px"></div><div class="skeleton" style="height:320px;border-radius:12px"></div><div class="skeleton" style="height:320px;border-radius:12px"></div></div>
+</div></section>
+
+<!-- NEWSLETTER -->
+<div class="newsletter"><div class="container">
+  <h3>📬 Stay in the Loop</h3>
+  <p>New arrivals, exclusive deals — straight to your inbox.</p>
+  <form class="nl-form" onsubmit="e=>{e.preventDefault();toast('✓ Subscribed!','ok');e.target.reset()}">
+    <input type="email" placeholder="Your email address" required>
+    <button type="submit" class="btn btn-primary">Subscribe</button>
+  </form>
+</div></div>
+
+<div id="site-footer"></div>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script>
+// Carousel
+const SLIDES=document.querySelectorAll('.slide');
+let cur=0,timer;
+function buildDots(){document.getElementById('carousel-dots').innerHTML=Array.from(SLIDES).map((_,i)=>`<button class="dot ${i===0?'active':''}" onclick="goSlide(${i})"></button>`).join('');}
+function goSlide(n){SLIDES[cur].classList.remove('active');document.querySelectorAll('.dot')[cur]?.classList.remove('active');cur=(n+SLIDES.length)%SLIDES.length;SLIDES[cur].classList.add('active');document.querySelectorAll('.dot')[cur]?.classList.add('active');}
+function moveSlide(d){goSlide(cur+d);resetTimer();}
+function resetTimer(){clearInterval(timer);timer=setInterval(()=>moveSlide(1),5500);}
+buildDots();resetTimer();
+
+const catColors={'urdu-books':'linear-gradient(135deg,#fff0f0,#ffd6d6)','islamic-books':'linear-gradient(135deg,#edfff4,#ccf0d8)','english-books':'linear-gradient(135deg,#e8f4ff,#cce4ff)','kids-corner':'linear-gradient(135deg,#fff8e6,#ffe8b3)','academic-books':'linear-gradient(135deg,#f4eeff,#e0d0ff)'};
+
+(async()=>{
+  await Store.ready();
+  mountLayout('home');
+  const cats=Store.getCategories();
+  const books=Store.getBooks();
+  const featured=books.filter(b=>b.featured);
+
+  document.getElementById('cat-grid').innerHTML=cats.map(c=>`
+    <a href="categories.html?cat=${c.slug}" class="cat-card">
+      <div class="cat-emoji" style="background:${catColors[c.slug]||'linear-gradient(135deg,var(--sand),var(--sand2))'}">
+        ${c.icon||'📚'}
+      </div>
+      <div class="cat-label"><span>${c.name}</span></div>
+    </a>`).join('');
+
+  document.getElementById('featured-grid').innerHTML=featured.length
+    ?featured.slice(0,8).map(bookCardHTML).join('')
+    :`<p style="color:var(--muted2);grid-column:1/-1;padding:2rem 0">No featured books yet.</p>`;
+
+  document.getElementById('new-grid').innerHTML=books.slice(0,8).map(bookCardHTML).join('');
+
+  const hbg=document.getElementById('hero-book-grid');
+  if(hbg) hbg.innerHTML=featured.slice(0,4).map(b=>`
+    <div class="hero-book-card">
+      ${b.cover?`<img src="${b.cover}" alt="${b.title}" loading="lazy">`:`<div class="book-placeholder">📚</div>`}
+    </div>`).join('');
+})();
+</script>
+</body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book — KitabGhar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section style="padding:3rem 0"><div class="container">
+  <p class="breadcrumb" style="margin-bottom:1.25rem"><a href="index.html">Home</a> / <a href="categories.html">Books</a> / <span id="crumb">...</span></p>
+  <div id="product-root"></div>
+</div></section>
+<section class="section" style="padding-top:0"><div class="container">
+  <div class="section-head"><div><h2>You May Also Like</h2><p>More from this category.</p></div></div>
+  <div class="books-grid" id="related-grid"></div>
+</div></section>
+<div id="site-footer"></div>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script>
+function starsStr(r=4.5){const f=Math.floor(r);return '★'.repeat(f)+(r%1>=.5?'½':'')+'☆'.repeat(5-f-(r%1>=.5?1:0));}
+(async()=>{
+  await Store.ready();
+  mountLayout();
+  const id=new URLSearchParams(location.search).get('id');
+  const book=Store.getBook(id);
+  const root=document.getElementById('product-root');
+  if(!book){
+    root.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><h2>Book Not Found</h2><p style="color:var(--muted2);margin:.5rem 0 1.5rem">This book does not exist or has been removed.</p><a href="categories.html" class="btn btn-primary">Browse Books</a></div>`;
+    return;
+  }
+  document.title=book.title+' — KitabGhar';
+  document.getElementById('crumb').textContent=book.title;
+  const out=book.stock<=0;
+  const allImgs=[...(book.cover?[book.cover]:[]),...(book.images||[])];
+  const cat=Store.getCategories().find(c=>c.slug===book.category);
+
+  root.innerHTML=`
+  <div class="product-layout">
+    <div>
+      <div class="gallery-main" onclick="openLightbox()" id="gallery-main">
+        ${allImgs.length?`<img id="main-img" src="${allImgs[0]}" alt="${book.title}">`:`<div class="book-placeholder" style="height:100%;font-size:4rem">📚</div>`}
+      </div>
+      ${allImgs.length>1?`<div class="gallery-thumbs">${allImgs.map((s,i)=>`<div class="g-thumb ${i===0?'active':''}" onclick="switchImg(${i})" id="th-${i}"><img src="${s}" alt=""></div>`).join('')}</div>`:''}
+    </div>
+    <div>
+      ${book.featured?`<span class="badge badge-gold" style="margin-bottom:.5rem">⭐ Featured</span>`:''}
+      <h1 style="font-size:clamp(1.6rem,3vw,2.25rem)">${book.title}</h1>
+      <p style="color:var(--muted2);margin-top:.3rem">by <strong>${book.author||'Unknown'}</strong></p>
+      <div style="display:flex;align-items:center;gap:.3rem;margin:.5rem 0">
+        <span style="color:var(--gold);font-size:1rem">${starsStr(book.rating||4.5)}</span>
+        <span style="color:var(--muted2);font-size:.82rem">${book.rating||4.5} (${book.reviews||0} reviews)</span>
+      </div>
+      <div style="font-size:2.2rem;font-weight:800;color:var(--bark);margin:.5rem 0">Rs. ${Number(book.price).toLocaleString('en-PK')}</div>
+      <div class="badge-row" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem">
+        <span class="badge ${out?'badge-red':'badge-green'}">${out?'❌ Out of Stock':'✓ In Stock — '+book.stock+' available'}</span>
+        ${cat?`<span class="badge badge-brown">${cat.icon||''} ${cat.name}</span>`:''}
+      </div>
+      ${book.description?`<p style="color:var(--muted);line-height:1.8;margin-bottom:1.25rem">${book.description}</p>`:''}
+      <div style="margin-bottom:1.25rem;${out?'opacity:.5;pointer-events:none':''}">
+        <label style="font-weight:700;font-size:.85rem;margin-bottom:.5rem;display:block">Quantity</label>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <div class="qty">
+            <button onclick="chQty(-1)">−</button>
+            <input type="number" id="qty-i" value="1" min="1" max="${book.stock}">
+            <button onclick="chQty(1)">+</button>
+          </div>
+          <span style="font-size:.78rem;color:var(--muted2)">Max: ${book.stock}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem">
+        <button class="btn btn-primary btn-lg" onclick="addCart()" ${out?'disabled':''}>🛒 Add to Cart</button>
+        <button class="btn btn-outline btn-lg" onclick="buyNow()" ${out?'disabled':''}>Buy Now →</button>
+      </div>
+      <div class="delivery-strip">
+        <div class="ds-item"><strong>🚚 Free Delivery</strong><span>Above Rs. 2,000</span></div>
+        <div class="ds-item"><strong>💵 Cash on Delivery</strong><span>Pay on receipt</span></div>
+        <div class="ds-item"><strong>↩️ Easy Returns</strong><span>7-day policy</span></div>
+      </div>
+      ${Admin.isLoggedIn()?`<div style="display:flex;gap:.5rem;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)">
+        <button class="btn btn-ghost btn-sm" onclick="editBook('${book.id}')">✏️ Edit Book</button>
+        <button class="btn btn-danger btn-sm" onclick="delBook('${book.id}')">🗑️ Delete</button>
+      </div>`:''}
+    </div>
+  </div>`;
+
+  window._imgs=allImgs; window._curImg=0;
+  window.switchImg=i=>{
+    const el=document.getElementById('main-img');
+    if(el){el.src=_imgs[i];}
+    document.querySelectorAll('.g-thumb').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+    _curImg=i;
+  };
+  window.openLightbox=()=>{
+    const src=_imgs[_curImg];if(!src)return;
+    const lb=document.createElement('div');
+    lb.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:1rem';
+    lb.innerHTML=`<img src="${src}" style="max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain">`;
+    lb.onclick=()=>lb.remove();
+    document.body.appendChild(lb);
+  };
+  window.chQty=d=>{const i=document.getElementById('qty-i');i.value=Math.max(1,Math.min(book.stock,+i.value+d));};
+  window.addCart=()=>{Store.addToCart(book.id,+document.getElementById('qty-i').value);toast(`✓ "${book.title}" added to cart`,'ok');};
+  window.buyNow=()=>{addCart();setTimeout(()=>location.href='checkout.html',500);};
+
+  const related=Store.getBooks().filter(b=>b.category===book.category&&b.id!==book.id).slice(0,4);
+  document.getElementById('related-grid').innerHTML=related.length?related.map(bookCardHTML).join(''):`<p style="color:var(--muted2)">No related books yet.</p>`;
+})();
+</script>
+</body></html>

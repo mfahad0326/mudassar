@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkout — KitabGhar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+<section class="page-head"><div class="container">
+  <p class="breadcrumb"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / Checkout</p>
+  <h1>Checkout</h1>
+</div></section>
+<section style="padding:3rem 0;min-height:60vh"><div class="container"><div id="co-root"></div></div></section>
+<div id="site-footer"></div>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+<script>
+const W3F='af8db103-a5ae-4e0a-8d99-a61b79c2ec1e';
+function Rs(n){return 'Rs. '+Number(n).toLocaleString('en-PK');}
+function vReq(id,errId,msg){const el=document.getElementById(id);const ok=el.value.trim().length>0;el.classList.toggle('field-error',!ok);el.classList.toggle('field-ok',ok);const e=document.getElementById(errId);if(e){e.textContent=msg||'Required.';e.classList.toggle('show',!ok);}return ok;}
+function vPhone(id,errId){const el=document.getElementById(id);const raw=el.value.replace(/[\s\-]/g,'');const ok=/^(\+92|92|0)3[0-9]{9}$/.test(raw);const has=el.value.length>0;el.classList.toggle('field-error',!ok&&has);el.classList.toggle('field-ok',ok);const e=document.getElementById(errId);if(e)e.classList.toggle('show',!ok&&has);return ok;}
+function vEmail(id,errId){const el=document.getElementById(id);if(!el.value.trim()){el.classList.remove('field-error','field-ok');return true;}const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value);el.classList.toggle('field-error',!ok);el.classList.toggle('field-ok',ok);const e=document.getElementById(errId);if(e)e.classList.toggle('show',!ok);return ok;}
+
+(async()=>{
+  await Store.ready();
+  mountLayout();
+  const cart=Store.getCart();
+  const items=cart.map(c=>({...c,book:Store.getBook(c.id)})).filter(i=>i.book);
+  const root=document.getElementById('co-root');
+
+  if(!items.length){root.innerHTML=`<div class="empty"><div class="empty-icon">🛒</div><h2>Your cart is empty</h2><a href="categories.html" class="btn btn-primary" style="margin-top:1rem">Browse Books</a></div>`;return;}
+
+  const sub=items.reduce((s,i)=>s+i.book.price*i.qty,0);
+  const ship=sub>=2000?0:200;
+  const total=sub+ship;
+
+  root.innerHTML=`<div class="checkout-layout">
+  <div>
+    <form id="co-form" onsubmit="placeOrder(event)" novalidate>
+      <div class="checkout-section">
+        <h3>Contact Information</h3>
+        <div class="form-row">
+          <div class="form-group"><label>First Name *</label><input id="f-fn" required placeholder="Ali" oninput="vReq('f-fn','e-fn')"><p class="err-msg" id="e-fn">Required</p></div>
+          <div class="form-group"><label>Last Name *</label><input id="f-ln" required placeholder="Raza" oninput="vReq('f-ln','e-ln')"><p class="err-msg" id="e-ln">Required</p></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Phone *</label><input id="f-ph" type="tel" required placeholder="03XX-XXXXXXX" oninput="vPhone('f-ph','e-ph')"><p class="err-msg" id="e-ph">Valid Pakistani number required (e.g. 0300-1234567)</p></div>
+          <div class="form-group"><label>Email <span style="font-weight:400;color:var(--muted2)">(optional)</span></label><input id="f-em" type="email" placeholder="you@example.com" oninput="vEmail('f-em','e-em')"><p class="err-msg" id="e-em">Invalid email</p></div>
+        </div>
+      </div>
+      <div class="checkout-section">
+        <h3>Delivery Address</h3>
+        <div class="form-group"><label>Street Address *</label><textarea id="f-ad" required rows="2" placeholder="House no, Street, Area" oninput="vReq('f-ad','e-ad')"></textarea><p class="err-msg" id="e-ad">Required</p></div>
+        <div class="form-row">
+          <div class="form-group"><label>City *</label><input id="f-ct" required placeholder="Lahore" oninput="vReq('f-ct','e-ct')"><p class="err-msg" id="e-ct">Required</p></div>
+          <div class="form-group"><label>Postal Code</label><input id="f-pc" placeholder="54000"></div>
+        </div>
+      </div>
+      <div class="checkout-section">
+        <h3>Payment Method</h3>
+        <label class="payment-opt"><input type="radio" name="pay" value="cod" checked><div><strong>💵 Cash on Delivery</strong><p style="font-size:.8rem;color:var(--muted2);margin-top:.15rem">Pay when you receive your order.</p></div></label>
+      </div>
+      <div class="checkout-section">
+        <h3>Order Notes <span style="font-weight:400;font-size:.85rem;color:var(--muted2)">(Optional)</span></h3>
+        <textarea id="f-nt" rows="2" placeholder="Special delivery instructions..."></textarea>
+      </div>
+      <div id="co-err" style="display:none;color:var(--red);font-size:.85rem;font-weight:600;padding:.6rem 1rem;background:rgba(192,57,43,.06);border-left:3px solid var(--red);border-radius:8px;margin-bottom:.75rem">⚠️ Please fix the errors above.</div>
+    </form>
+  </div>
+  <div>
+    <div class="order-summary">
+      <h3 style="margin-bottom:1.25rem">Order Summary</h3>
+      ${items.map(i=>`
+        <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)">
+          ${i.book.cover?`<img src="${i.book.cover}" style="width:42px;height:54px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'">`:`<div style="width:42px;height:54px;background:var(--sand);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">📚</div>`}
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.book.title}</div><div style="font-size:.74rem;color:var(--muted2)">Qty: ${i.qty}</div></div>
+          <div style="font-weight:700;color:var(--bark);font-size:.88rem;white-space:nowrap">${Rs(i.book.price*i.qty)}</div>
+        </div>`).join('')}
+      <div class="summary-row" style="margin-top:.25rem"><span>Subtotal</span><span>${Rs(sub)}</span></div>
+      <div class="summary-row"><span>Shipping</span><span style="color:${ship===0?'var(--green)':'inherit'};font-weight:${ship===0?'700':'400'}">${ship===0?'✓ Free':Rs(ship)}</span></div>
+      <div class="summary-row" style="font-size:1.1rem;font-weight:800;color:var(--ink)"><span>Total</span><span>${Rs(total)}</span></div>
+      <button id="place-btn" type="submit" form="co-form" class="btn btn-primary btn-block" style="margin-top:1.25rem">Place Order — ${Rs(total)}</button>
+      <a href="cart.html" class="btn btn-ghost btn-block" style="margin-top:.5rem">← Back to Cart</a>
+      <p style="font-size:.74rem;color:var(--muted2);text-align:center;margin-top:1rem">🔒 Your info is safe. Used only for delivery.</p>
+    </div>
+  </div>
+  </div>`;
+
+  window.placeOrder=async(e)=>{
+    e.preventDefault();
+    const err=document.getElementById('co-err');
+    const ok=[vReq('f-fn','e-fn'),vReq('f-ln','e-ln'),vPhone('f-ph','e-ph'),vEmail('f-em','e-em'),vReq('f-ad','e-ad'),vReq('f-ct','e-ct')].every(Boolean);
+    if(!ok){err.style.display='block';document.querySelector('.field-error')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    err.style.display='none';
+    const btn=document.getElementById('place-btn');
+    btn.disabled=true;btn.textContent='Placing order...';
+    const fn=document.getElementById('f-fn').value;
+    const ln=document.getElementById('f-ln').value;
+    const ph=document.getElementById('f-ph').value;
+    const em=document.getElementById('f-em').value;
+    const ad=document.getElementById('f-ad').value;
+    const ct=document.getElementById('f-ct').value;
+    const pc=document.getElementById('f-pc').value;
+    const nt=document.getElementById('f-nt').value;
+    const ordId='ORD-'+Date.now();
+    const now=new Date().toLocaleString('en-PK',{timeZone:'Asia/Karachi',dateStyle:'long',timeStyle:'short'});
+
+    const rows=items.map(i=>`<tr><td style="padding:10px 8px;border-bottom:1px solid #e8d8c0;font-size:14px">${i.book.title}</td><td style="padding:10px 8px;border-bottom:1px solid #e8d8c0;text-align:center;font-size:14px">${i.qty}</td><td style="padding:10px 8px;border-bottom:1px solid #e8d8c0;text-align:right;font-size:14px">Rs. ${Number(i.book.price).toLocaleString('en-PK')}</td><td style="padding:10px 8px;border-bottom:1px solid #e8d8c0;text-align:right;font-size:14px;font-weight:700;color:#8b5e3c">Rs. ${Number(i.book.price*i.qty).toLocaleString('en-PK')}</td></tr>`).join('');
+
+    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f5ede0;font-family:'Segoe UI',Arial,sans-serif"><div style="max-width:620px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(60,30,10,.12)"><div style="background:linear-gradient(135deg,#8b5e3c,#6b4428);padding:28px 36px;text-align:center"><h1 style="margin:0;color:#fff;font-size:26px">📚 KitabGhar</h1><p style="margin:5px 0 0;color:rgba(255,255,255,.7);font-size:12px;letter-spacing:.08em;text-transform:uppercase">New Order Received</p></div><div style="background:#fdf8f2;border-bottom:1px solid #e8d8c0;padding:14px 36px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><p style="margin:0;font-size:11px;color:#a08060;text-transform:uppercase;letter-spacing:.08em;font-weight:600">Order ID</p><p style="margin:3px 0 0;font-size:15px;font-weight:700;color:#1e140a">${ordId}</p></div><div style="text-align:right"><p style="margin:0;font-size:11px;color:#a08060;text-transform:uppercase;letter-spacing:.08em;font-weight:600">Date</p><p style="margin:3px 0 0;font-size:13px;color:#1e140a">${now}</p></div></div><div style="padding:28px 36px"><h2 style="margin:0 0 14px;font-size:15px;color:#8b5e3c;text-transform:uppercase;letter-spacing:.06em;padding-bottom:8px;border-bottom:2px solid #e8d8c0">👤 Customer</h2><table style="width:100%;border-collapse:collapse;margin-bottom:24px"><tr><td style="padding:7px 0;font-size:13px;color:#a08060;font-weight:600;width:110px">Name</td><td style="padding:7px 0;font-size:14px;font-weight:700">${fn} ${ln}</td></tr><tr><td style="padding:7px 0;font-size:13px;color:#a08060;font-weight:600">Phone</td><td style="padding:7px 0;font-size:14px;font-weight:700">${ph}</td></tr>${em?`<tr><td style="padding:7px 0;font-size:13px;color:#a08060;font-weight:600">Email</td><td style="padding:7px 0;font-size:14px">${em}</td></tr>`:''}</table><h2 style="margin:0 0 14px;font-size:15px;color:#8b5e3c;text-transform:uppercase;letter-spacing:.06em;padding-bottom:8px;border-bottom:2px solid #e8d8c0">📦 Delivery Address</h2><div style="background:#fdf8f2;border-radius:10px;padding:14px 18px;margin-bottom:24px;border:1px solid #e8d8c0"><p style="margin:0;font-size:14px;line-height:1.7">${ad}<br><strong>${ct}${pc?' — '+pc:''}</strong></p></div><h2 style="margin:0 0 14px;font-size:15px;color:#8b5e3c;text-transform:uppercase;letter-spacing:.06em;padding-bottom:8px;border-bottom:2px solid #e8d8c0">📚 Books Ordered</h2><table style="width:100%;border-collapse:collapse;margin-bottom:8px"><thead><tr style="background:#f5ede0"><th style="padding:9px 8px;text-align:left;font-size:11px;color:#a08060;font-weight:700;text-transform:uppercase">Book</th><th style="padding:9px 8px;text-align:center;font-size:11px;color:#a08060;font-weight:700;text-transform:uppercase">Qty</th><th style="padding:9px 8px;text-align:right;font-size:11px;color:#a08060;font-weight:700;text-transform:uppercase">Price</th><th style="padding:9px 8px;text-align:right;font-size:11px;color:#a08060;font-weight:700;text-transform:uppercase">Total</th></tr></thead><tbody>${rows}</tbody></table><div style="background:#fdf8f2;border-radius:10px;overflow:hidden;border:1px solid #e8d8c0;margin-bottom:24px"><div style="display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #e8d8c0"><span style="font-size:13px;color:#7a6040">Subtotal</span><span style="font-size:13px;font-weight:600">Rs. ${Number(sub).toLocaleString('en-PK')}</span></div><div style="display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #e8d8c0"><span style="font-size:13px;color:#7a6040">Shipping</span><span style="font-size:13px;color:${ship===0?'#2d8a4e':'#1e140a'};font-weight:600">${ship===0?'✓ FREE':'Rs. '+Number(ship).toLocaleString('en-PK')}</span></div><div style="display:flex;justify-content:space-between;padding:13px 14px;background:#8b5e3c"><span style="font-size:14px;color:#fdf8f2;font-weight:700">GRAND TOTAL</span><span style="font-size:17px;color:#fdf8f2;font-weight:800">Rs. ${Number(total).toLocaleString('en-PK')}</span></div></div>${nt?`<div style="background:#fdf7e3;border-radius:10px;padding:12px 16px;border:1px solid rgba(212,160,23,.2)"><p style="margin:0 0 4px;font-size:11px;color:#c8960a;font-weight:700;text-transform:uppercase">Order Notes</p><p style="margin:0;font-size:13px">${nt}</p></div>`:''}  </div><div style="background:#1e140a;padding:20px 36px;text-align:center"><p style="margin:0;color:rgba(253,248,242,.5);font-size:11px">📍 Lahore, Pakistan | 📞 +92 300 0000000 | 📧 hello@kitabghar.pk</p></div></div></body></html>`;
+
+    try{
+      const res=await fetch('https://api.web3forms.com/submit',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({access_key:W3F,subject:`🛒 New Order ${ordId} — ${fn} ${ln} (Rs. ${Number(total).toLocaleString('en-PK')})`,from_name:'KitabGhar Orders',name:`${fn} ${ln}`,email:em||'orders@kitabghar.pk',phone:ph,message:`Order ${ordId}\n${fn} ${ln}\n${ph}\n${ad}, ${ct}\n\n${items.map(i=>`${i.book.title} x${i.qty} = Rs.${i.book.price*i.qty}`).join('\n')}\n\nTotal: Rs.${total}`,html})});
+      const d=await res.json().catch(()=>({}));
+      if(!res.ok||!d.success)throw new Error(d.message||'Failed');
+      Store.addOrder({id:ordId,items:items.map(i=>({id:i.book.id,title:i.book.title,price:i.book.price,qty:i.qty})),sub,ship,total,customer:{fn,ln,ph,em,ad,ct,pc,nt}});
+      Store.clearCart();
+      location.href='success.html?order='+ordId;
+    }catch(err){
+      btn.disabled=false;btn.textContent=`Place Order — ${Rs(total)}`;
+      toast('Order failed: '+err.message+'. Try again.','fail');
+    }
+  };
+})();
+</script>
+</body></html>
